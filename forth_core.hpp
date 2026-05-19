@@ -176,7 +176,11 @@ namespace Forth {
         DataStack& get_data_stack() { return data_stack; }
         void set_user_data(void* data) { user_data = data; }
         void* get_user_data() { return user_data; }
-
+        // В классе ForthInterpreter добавьте:
+    public:
+        std::unordered_map<std::string, Word>& get_dictionary() {
+            return dictionary;
+        }
     private:
         void init_primitive_words() {
             // DUP

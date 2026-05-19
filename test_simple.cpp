@@ -7,27 +7,29 @@
 int main() {
     std::cout << "Testing SFML directly..." << std::endl;
 
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Test");
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML Test");
 
     // Рисуем простые фигуры
     sf::CircleShape circle(50.0f);
     circle.setFillColor(sf::Color::Red);
-    circle.setPosition(375, 250);
+    circle.setPosition({375, 250});
 
     sf::RectangleShape rectangle(sf::Vector2f(100, 100));
     rectangle.setFillColor(sf::Color::Green);
-    rectangle.setPosition(100, 100);
+    rectangle.setPosition({100, 100});
 
     sf::RectangleShape line(sf::Vector2f(200, 3));
     line.setFillColor(sf::Color::Blue);
-    line.setPosition(300, 400);
+    line.setPosition({300, 400});
 
     while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+	// ТАК НАДО В SFML 3
+	while (const std::optional<sf::Event> event = window.pollEvent()) {
+	    // Проверка событий, которые не несут в себе данных (например, закрытие окна)
+	    if (event->is<sf::Event::Closed>()) {
+	        window.close();
+	    }
+	}
 
         window.clear(sf::Color::Black);
         window.draw(circle);
