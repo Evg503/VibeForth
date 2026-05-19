@@ -9,7 +9,7 @@ public:
     sf::RenderWindow window;
     sf::Color current_color{255, 255, 255};
     
-    GraphicsContext() : window(sf::VideoMode(800, 600), "Forth Graphics with Loops") {}
+    GraphicsContext() : window(sf::VideoMode({800, 600}), "Forth Graphics with Loops") {}
     
     void clear() { window.clear(sf::Color::Black); }
     void display() { window.display(); }
@@ -17,14 +17,14 @@ public:
     
     void draw_circle(float x, float y, float r) {
         sf::CircleShape circle(r);
-        circle.setPosition(x - r, y - r);
+        circle.setPosition({x - r, y - r});
         circle.setFillColor(current_color);
         window.draw(circle);
     }
     
     void draw_rectangle(float x, float y, float w, float h) {
         sf::RectangleShape rect(sf::Vector2f(w, h));
-        rect.setPosition(x, y);
+        rect.setPosition({x, y});
         rect.setFillColor(current_color);
         window.draw(rect);
     }
@@ -33,18 +33,20 @@ public:
         float dx = x2 - x1, dy = y2 - y1;
         float len = std::sqrt(dx*dx + dy*dy);
         sf::RectangleShape line(sf::Vector2f(len, thickness));
-        float angle = std::atan2(dy, dx) * 180 / 3.14159f;
-        line.setPosition(x1, y1);
-        line.setRotation(angle);
+        float angle = std::atan2(dy, dx);
+        line.setPosition({x1, y1});
+        line.setRotation(sf::radians(angle));
         line.setFillColor(current_color);
         window.draw(line);
     }
     
     void handle_events() {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+        // ТАК НАДО В SFML 3
+        while (const std::optional<sf::Event> event = window.pollEvent()) {
+            // Проверка событий, которые не несут в себе данных (например, закрытие окна)
+            if (event->is<sf::Event::Closed>()) {
                 window.close();
+            }
         }
     }
     

@@ -694,7 +694,7 @@ private:
         if (s.empty()) return false;
         try {
             size_t pos;
-            std::stoll(s, &pos);
+            (void)std::stoll(s, &pos);
             return pos == s.length();
         } catch (...) {
             return false;
@@ -705,7 +705,7 @@ private:
         if (s.empty()) return false;
         try {
             size_t pos;
-            std::stod(s, &pos);
+            (void)std::stod(s, &pos);
             return pos == s.length();
         } catch (...) {
             return false;

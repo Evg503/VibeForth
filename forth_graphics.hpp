@@ -98,15 +98,15 @@ namespace ForthGraphics {
         void handle_events() {
             if (!window) return;
 
-	// ТАК НАДО В SFML 3
-	while (const std::optional<sf::Event> event = window->pollEvent()) {
-	    // Проверка событий, которые не несут в себе данных (например, закрытие окна)
-	    	if (event->is<sf::Event::Closed>()) {
-	            window->close();
-		    window_open = false;
-	    	}
-	    }
-	}
+            // ТАК НАДО В SFML 3
+            while (const std::optional<sf::Event> event = window->pollEvent()) {
+                // Проверка событий, которые не несут в себе данных (например, закрытие окна)
+                if (event->is<sf::Event::Closed>()) {
+                    window->close();
+                window_open = false;
+                }
+            }
+        }
     };
 
     // Функция регистрации графических слов
@@ -116,7 +116,7 @@ namespace ForthGraphics {
         // Сохраняем указатель на графический контекст
         forth.set_user_data(&graphics);
 
-	auto& dictionary = forth.get_dictionary();
+    auto& dictionary = forth.get_dictionary();
         // Создание окна
         dictionary["OPEN-WINDOW"] = Word([&graphics](ForthInterpreter& f) {
             int height = f.get_data_stack().pop_int();

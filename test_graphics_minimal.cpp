@@ -9,11 +9,11 @@ class SimpleGraphics {
 public:
     sf::RenderWindow window;
 
-    SimpleGraphics() : window(sf::VideoMode(800, 600), "Forth Graphics") {}
+    SimpleGraphics() : window(sf::VideoMode({800, 600}), "Forth Graphics") {}
 
     void draw_circle(float x, float y, float r) {
         sf::CircleShape circle(r);
-        circle.setPosition(x - r, y - r);
+        circle.setPosition({x - r, y - r});
         circle.setFillColor(sf::Color::White);
         window.draw(circle);
     }
@@ -31,10 +31,12 @@ public:
     }
 
     void handle_events() {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+        // ТАК НАДО В SFML 3
+        while (const std::optional<sf::Event> event = window.pollEvent()) {
+            // Проверка событий, которые не несут в себе данных (например, закрытие окна)
+            if (event->is<sf::Event::Closed>()) {
                 window.close();
+            }
         }
     }
 };
