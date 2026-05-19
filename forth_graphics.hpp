@@ -24,7 +24,7 @@ namespace ForthGraphics {
 
         bool create_window(unsigned int width, unsigned int height, const std::string& title) {
             window = std::make_unique<sf::RenderWindow>(
-                sf::VideoMode(width, height),
+                sf::VideoMode({width, height}),
                 title,
                 sf::Style::Close | sf::Style::Titlebar
             );
@@ -63,7 +63,7 @@ namespace ForthGraphics {
             if (!window) return;
 
             auto circle = std::make_unique<sf::CircleShape>(radius);
-            circle->setPosition(x - radius, y - radius);
+            circle->setPosition({x - radius, y - radius});
             circle->setFillColor(current_color);
             window->draw(*circle);
             drawables.push_back(std::move(circle));
@@ -73,7 +73,7 @@ namespace ForthGraphics {
             if (!window) return;
 
             auto rect = std::make_unique<sf::RectangleShape>(sf::Vector2f(width, height));
-            rect->setPosition(x, y);
+            rect->setPosition({x, y});
             rect->setFillColor(current_color);
             window->draw(*rect);
             drawables.push_back(std::move(rect));
@@ -87,9 +87,9 @@ namespace ForthGraphics {
             float length = std::sqrt(dx * dx + dy * dy);
 
             auto line = std::make_unique<sf::RectangleShape>(sf::Vector2f(length, thickness));
-            float angle = std::atan2(dy, dx) * 180 / 3.14159265f;
-            line->setPosition(x1, y1);
-            line->setRotation(angle);
+            float angle = std::atan2(dy, dx);
+            line->setPosition({x1, y1});
+            line->setRotation(sf::radians(angle));
             line->setFillColor(current_color);
             window->draw(*line);
             drawables.push_back(std::move(line));
@@ -98,14 +98,15 @@ namespace ForthGraphics {
         void handle_events() {
             if (!window) return;
 
-            sf::Event event;
-            while (window->pollEvent(event)) {
-                if (event.type == sf::Event::Closed) {
-                    window->close();
-                    window_open = false;
-                }
-            }
-        }
+	// ТАК НАДО В SFML 3
+	while (const std::optional<sf::Event> event = window->pollEvent()) {
+	    // Проверка событий, которые не несут в себе данных (например, закрытие окна)
+	    	if (event->is<sf::Event::Closed>()) {
+	            window->close();
+		    window_open = false;
+	    	}
+	    }
+	}
     };
 
     // Функция регистрации графических слов
@@ -115,6 +116,7 @@ namespace ForthGraphics {
         // Сохраняем указатель на графический контекст
         forth.set_user_data(&graphics);
 
+	auto& dictionary = forth.get_dictionary();
         // Создание окна
         dictionary["OPEN-WINDOW"] = Word([&graphics](ForthInterpreter& f) {
             int height = f.get_data_stack().pop_int();
@@ -179,7 +181,7 @@ namespace ForthGraphics {
 
         // Проверка открытости окна
         dictionary["WINDOW-OPEN?"] = Word([&graphics](ForthInterpreter& f) {
-            f.get_data_stack().push(graphics.is_open() ? 1 : 0);
+            f.get_data_stack().push(graphics.is_open() ? 1.f : 0.f);
             });
     }
 
